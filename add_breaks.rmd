@@ -1,0 +1,40 @@
+---
+title: "Untitled"
+author: "tc"
+date: "August 18, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+
+
+Break_data <- data.table::fread("./Break_data.csv")
+
+df <- data.table::fread("./df.csv",header = TRUE)
+
+Break_data$Start <- ymd(Break_data$Start)
+Break_data$End <- ymd(Break_data$End)
+df$date <- mdy(df$date)
+LU <-  Map(`:`, Break_data$Start, Break_data$End)
+LU <- data.frame(value = unlist(LU),
+                 index = rep(seq_along(LU), lapply(LU, length)))
+df$Break <- Break_data$Break[LU$index[match(df$date, LU$value)]]
+
+
+# if not mapped(NA), then it is non_break
+df$Break <- ifelse(is.na(df$Break), "Non_Break", df$Break)
+
+head(df)
+
+table(df$Break)
+
+```
+
+
+
